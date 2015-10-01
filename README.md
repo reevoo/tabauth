@@ -1,7 +1,7 @@
 # tabauth
 
-Tabauth is a thin proxy over Tableau Server's [Trusted Authentication Endpoint](http://onlinehelp.tableau.com/current/server/en-us/help.htm#trusted_auth.htm%3FTocPath%3DAdministrator%2520Guide%7CTrusted%2520Authentication%7C_____0)
-It allows other servers, with access to authenticate using BasicAuth over https. This removes any requirement for our servers to have static IP addresses.
+Tabauth is a thin wrapper service over Tableau Server's [Trusted Authentication Endpoint](http://onlinehelp.tableau.com/current/server/en-us/help.htm#trusted_auth.htm%3FTocPath%3DAdministrator%2520Guide%7CTrusted%2520Authentication%7C_____0)
+It allows other servers, to authenticate using BasicAuth over https. This removes any requirement for consuming applications to have static IP addresses.
 
 ## Usage
 
@@ -27,18 +27,21 @@ vgLDqQwHx_09iiUUDZwFPacZ
 
 You need go:
 
+On OSX With Homebrew:
 `brew install go`
+
+Or follow these instructions for [other platforms](https://golang.org/doc/install)
 
 ## Testing
 
 This project is tested with [GoConvey](http://goconvey.co/).
 
-You can run the tests -
+You can run the tests:
 
-From the command line:
+* From the command line:
 `go test`
 
-In the browser:
+* In the browser:
 ```bash
 go get github.com/smartystreets/goconvey
 $GOPATH/bin/goconvey
@@ -68,6 +71,8 @@ $ env GOOS=windows GOARCH=amd64 go build tabauth.go
 
 This program is designed to be portable, so does not include any `Windows Service` functionality. We recommend running it with [NSSM](http://nssm.cc/).
 
+Prebuilt binaries for Windows/amd64 are avalible on the [releases page](https://github.com/reevoo/tabauth/releases)
+
 1. Create `C:\Program Files\tabauth\` (for example, put it wherever you like, but if its not here you may have to mess with permissions)
 2. Copy `tabauth.exe` to `C:\Program Files\tabauth\`
 3. Copy `cert.pem` and `key.pem` to `C:\Program Files\tabauth\`
@@ -95,3 +100,8 @@ In order for Tableau Server to "trust" tabauth, we need to configure it thus:
 3. Set localhost as trusted - `tabadmin set wgserver.trusted_hosts "127.0.0.1"`
 4. Reload config files - `tabadmin config`
 5. Restart tableau server `tabadmin start`
+
+
+## Licence
+
+This software is licenced under [The MIT License (MIT)](./LICENCE.md)
