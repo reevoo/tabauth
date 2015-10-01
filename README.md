@@ -16,6 +16,13 @@ You may restrict the tokens use by client IP address:
 $ curl --user user:password https://your-tableau-server/user/user-name/token?client_ip=10.10.10.10
 vgLDqQwHx_09iiUUDZwFPacZ
 ```
+If want to do this you will need to configure Tableau Server to check the client IP on redeeming the token.
+
+```
+tabadmin set wgserver.extended_trusted_ip_checking true
+tabadmin configure
+tabadmin restart
+```
 
 If you are using a site other than the default one, you will need to specify a site id
 ```bash
