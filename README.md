@@ -90,8 +90,8 @@ The defaults should be fine, but you may want to adjust details like Logging etc
 
 In order for Tableau Server to "trust" tabauth, we need to configure it thus:
 
-1) Get to the tabadmin command - `cd C:\Program Files\Tableau\Tableau Server\9.1\bin`
-2) Stop tableau server - `tabadmin stop`
-3) Set localhost as trusted - `tabadmin set wgserver.trusted_hosts "127.0.0.1"`
-4) Reload config files - `tabadmin config`
-5) Restart tableau server `tabadmin start`
+1. Get to the tabadmin command - `cd C:\Program Files\Tableau\Tableau Server\9.1\bin`
+2. Stop tableau server - `tabadmin stop`
+3. Set localhost as trusted - `tabadmin set wgserver.trusted_hosts "127.0.0.1"`
+4. Reload config files - `tabadmin config`
+5. Restart tableau server `tabadmin start`
