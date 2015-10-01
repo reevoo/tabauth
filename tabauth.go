@@ -15,6 +15,7 @@ func main() {
 }
 
 func TabAuth(client *Client) *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.Use(gin.BasicAuth(accounts()))
 

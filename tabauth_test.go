@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	. "github.com/smartystreets/goconvey/convey"
 	"io/ioutil"
 	"net/http"
@@ -72,7 +71,6 @@ func TestTabAuth(t *testing.T) {
 }
 
 func makeRequest(url string, auth string, code int) httptest.ResponseRecorder {
-	gin.SetMode(gin.ReleaseMode)
 	server, client := mockHTTP(code)
 	engine := TabAuth(client)
 	req, _ := http.NewRequest("GET", url, nil)
