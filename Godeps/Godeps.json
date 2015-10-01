@@ -1,0 +1,50 @@
+{
+	"ImportPath": "github.com/reevoo/tabauth",
+	"GoVersion": "go1.5",
+	"Deps": [
+		{
+			"ImportPath": "github.com/dustin/go-broadcast",
+			"Rev": "3bdf6d4a7164a50bc19d5f230e2981d87d2584f1"
+		},
+		{
+			"ImportPath": "github.com/gin-gonic/gin",
+			"Comment": "v1.0rc1-148-g52fcc5d",
+			"Rev": "52fcc5dbf6e94df33ad313858fb94b713e9d1b4a"
+		},
+		{
+			"ImportPath": "github.com/jacobsa/oglematchers",
+			"Rev": "4fc24f97b5b74022c2a3f4ca7eed57ca29083d3e"
+		},
+		{
+			"ImportPath": "github.com/manucorporat/sse",
+			"Rev": "c142f0f1baea5cef7f98a8a6c222f6134368c1f5"
+		},
+		{
+			"ImportPath": "github.com/manucorporat/stats",
+			"Rev": "8f2d6ace262eba462e9beb552382c98be51d807b"
+		},
+		{
+			"ImportPath": "github.com/mattn/go-colorable",
+			"Rev": "d67e0b7d1797975196499f79bcc322c08b9f218b"
+		},
+		{
+			"ImportPath": "github.com/smartystreets/goconvey/convey",
+			"Comment": "1.5.0-437-ga29728e",
+			"Rev": "a29728e4d70bb23e436d03bee49b1793e70a9352"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Comment": "v1.0-12-g7e4a149",
+			"Rev": "7e4a149930b09fe4c2b134c50ce637457ba6e966"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "dfe268fd2bb5c793f4c083803609fce9806c6f80"
+		},
+		{
+			"ImportPath": "gopkg.in/bluesuncorp/validator.v5",
+			"Comment": "v5.5.1",
+			"Rev": "1d61bf31487322f9bffa4d9f1eda4a53175b58dd"
+		}
+	]
+}

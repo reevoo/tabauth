@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
-	. "github.com/smartystreets/goconvey/convey"
+	. "github.com/reevoo/tabauth/Godeps/_workspace/src/github.com/smartystreets/goconvey/convey"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"

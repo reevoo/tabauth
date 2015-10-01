@@ -2,14 +2,14 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/gin-gonic/gin"
+	"github.com/reevoo/tabauth/Godeps/_workspace/src/github.com/gin-gonic/gin"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 )
 
 func main() {
-        client := &Client{"http://localhost", &http.Client{}}
+	client := &Client{"http://localhost", &http.Client{}}
 	r := TabAuth(client)
 	r.RunTLS("0.0.0.0:443", "cert.pem", "key.pem")
 }
@@ -36,22 +36,22 @@ func TabAuth(client *Client) *gin.Engine {
 }
 
 type Client struct {
-  BaseUrl string
-  HTTPClient  *http.Client
+	BaseUrl    string
+	HTTPClient *http.Client
 }
 
 func (c *Client) getToken(g *gin.Context) (string, error) {
-  form := url.Values{}
-  form.Add("username", g.Param("username"))
-  site_id := g.Query("site_id")
-  if site_id != "" {
-    form.Add("target_site", site_id)
-  }
-  client_ip := g.Query("client_ip")
-  if client_ip != "" {
-    form.Add("client_ip", client_ip)
-  }
-  resp, err := c.HTTPClient.PostForm(c.BaseUrl + "/trusted", form)
+	form := url.Values{}
+	form.Add("username", g.Param("username"))
+	site_id := g.Query("site_id")
+	if site_id != "" {
+		form.Add("target_site", site_id)
+	}
+	client_ip := g.Query("client_ip")
+	if client_ip != "" {
+		form.Add("client_ip", client_ip)
+	}
+	resp, err := c.HTTPClient.PostForm(c.BaseUrl+"/trusted", form)
 	if err != nil {
 		return "", err
 	}
