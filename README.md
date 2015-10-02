@@ -13,13 +13,7 @@ Prebuilt binaries for Windows/amd64 are avalible on the [releases page](https://
 1. Create `C:\Program Files\tabauth\` (for example, put it wherever you like, but if its not here you may have to mess with permissions)
 2. Copy `tabauth.exe` to `C:\Program Files\tabauth\`
 3. Copy `cert.pem` and `key.pem` to `C:\Program Files\tabauth\`
-4. Add accounts.json to `C:\Program Files\tabauth`
-  ```json
-  {
-    "user": "password",
-    "otheruser": "sekret"
-  }
-  ```
+4. Add accounts.json to `C:\Program Files\tabauth` [example](./accounts.json.example)
 5. Setup the service using nssm:
 ```
 nssm install tabauth C:\Program Files\tabauth\tabauth.exe
