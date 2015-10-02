@@ -19,15 +19,15 @@ func TabAuth(client *Client) *gin.Engine {
 	r := gin.Default()
 	r.Use(gin.BasicAuth(accounts()))
 
-	r.GET("/user/:username/token", func(c *gin.Context) {
-		token, err := client.getToken(c)
+	r.GET("/user/:username/ticket", func(c *gin.Context) {
+		ticket, err := client.getToken(c)
 		if err != nil {
 			c.String(500, err.Error())
 		} else {
-			if token == "-1\n" {
-				c.String(404, token)
+			if ticket == "-1\n" {
+				c.String(404, ticket)
 			} else {
-				c.String(200, token)
+				c.String(200, ticket)
 			}
 		}
 	})
@@ -55,12 +55,12 @@ func (c *Client) getToken(g *gin.Context) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	token, err := ioutil.ReadAll(resp.Body)
+	ticket, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 	if err != nil {
 		return "", err
 	}
-	return string(token), nil
+	return string(ticket), nil
 }
 
 func accounts() map[string]string {

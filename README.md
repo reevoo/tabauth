@@ -34,18 +34,18 @@ In order for Tableau Server to "trust" tabauth, we need to configure it thus:
 
 ## Usage
 
-You can request an access token for any user on your Tableau server:
+You can request an access ticket for any user on your Tableau server:
 ```bash
-$ curl --user user:password https://your-tableau-server/user/user-name/token
+$ curl --user user:password https://your-tableau-server/user/user-name/ticket
 1gfuPluHbQbRv-VVNr44ecTH
 ```
 
-You may restrict the tokens use by client IP address:
+You may restrict the tickets use by client IP address:
 ```bash
-$ curl --user user:password https://your-tableau-server/user/user-name/token?client_ip=10.10.10.10
+$ curl --user user:password https://your-tableau-server/user/user-name/ticket?client_ip=10.10.10.10
 vgLDqQwHx_09iiUUDZwFPacZ
 ```
-If want to do this you will need to configure Tableau Server to check the client IP on redeeming the token.
+If want to do this you will need to configure Tableau Server to check the client IP on redeeming the ticket.
 
 ```
 tabadmin set wgserver.extended_trusted_ip_checking true
@@ -55,7 +55,7 @@ tabadmin restart
 
 If you are using a site other than the default one, you will need to specify a site id
 ```bash
-$ curl --user user:password https://your-tableau-server/user/user-name/token?site_id=a4134fe9-d7ee-6783-88e9-a5eeb1f40476
+$ curl --user user:password https://your-tableau-server/user/user-name/ticket?site_id=a4134fe9-d7ee-6783-88e9-a5eeb1f40476
 vgLDqQwHx_09iiUUDZwFPacZ
 ```
 

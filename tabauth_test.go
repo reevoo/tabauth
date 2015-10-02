@@ -20,38 +20,38 @@ func TestTabAuth(t *testing.T) {
 			})
 
 			Convey("They should see a 200 when visting the correct path", func() {
-				w := makeRequest("http://example.com/user/foofah/token", "foo:bar", 200)
+				w := makeRequest("http://example.com/user/foofah/ticket", "foo:bar", 200)
 				So(w.Code, ShouldEqual, 200)
 			})
 
 			Convey("They should see a 500 when the backend is down", func() {
-				w := makeRequest("http://example.com/user/foofah/token", "foo:bar", 500)
+				w := makeRequest("http://example.com/user/foofah/ticket", "foo:bar", 500)
 				So(w.Code, ShouldEqual, 500)
 			})
 
-			Convey("They should see a 404 when the backend cannot find the token", func() {
-				w := makeRequest("http://example.com/user/foofah/token", "foo:bar", 404)
+			Convey("They should see a 404 when the backend cannot find the ticket", func() {
+				w := makeRequest("http://example.com/user/foofah/ticket", "foo:bar", 404)
 				So(w.Code, ShouldEqual, 404)
 				So(w.Body.String(), ShouldEqual, "-1\n")
 			})
 
-			Convey("the backend is called with the correct body, the token is returned unchanged", func() {
-				w := makeRequest("http://example.com/user/iamtheuser/token", "foo:bar", 200)
+			Convey("the backend is called with the correct body, the ticket is returned unchanged", func() {
+				w := makeRequest("http://example.com/user/iamtheuser/ticket", "foo:bar", 200)
 				So(w.Body.String(), ShouldEqual, "username=iamtheuser\n")
 			})
 
-			Convey("When the client IP is given, it is passed to the backend, the token is returned unchanged", func() {
-				w := makeRequest("http://example.com/user/iamtheuser/token?client_ip=10.10.10.15", "foo:bar", 200)
+			Convey("When the client IP is given, it is passed to the backend, the ticket is returned unchanged", func() {
+				w := makeRequest("http://example.com/user/iamtheuser/ticket?client_ip=10.10.10.15", "foo:bar", 200)
 				So(w.Body.String(), ShouldEqual, "client_ip=10.10.10.15&username=iamtheuser\n")
 			})
 
-			Convey("When the site ID is given, it is passed to the backend, the token is returned unchanged", func() {
-				w := makeRequest("http://example.com/user/iamtheuser/token?site_id=sdf86438brf34", "foo:bar", 200)
+			Convey("When the site ID is given, it is passed to the backend, the ticket is returned unchanged", func() {
+				w := makeRequest("http://example.com/user/iamtheuser/ticket?site_id=sdf86438brf34", "foo:bar", 200)
 				So(w.Body.String(), ShouldEqual, "target_site=sdf86438brf34&username=iamtheuser\n")
 			})
 
-			Convey("When the site ID and client IP are given, they are passed to the backend, the token is returned unchanged", func() {
-				w := makeRequest("http://example.com/user/iamtheuser/token?site_id=sdf86438brf34&client_ip=127.0.0.1", "foo:bar", 200)
+			Convey("When the site ID and client IP are given, they are passed to the backend, the ticket is returned unchanged", func() {
+				w := makeRequest("http://example.com/user/iamtheuser/ticket?site_id=sdf86438brf34&client_ip=127.0.0.1", "foo:bar", 200)
 				So(w.Body.String(), ShouldEqual, "client_ip=127.0.0.1&target_site=sdf86438brf34&username=iamtheuser\n")
 			})
 		})
@@ -63,7 +63,7 @@ func TestTabAuth(t *testing.T) {
 			})
 
 			Convey("They should see a 401 error when visiting a valid path", func() {
-				w := makeRequest("http://example.com/user/thenameofauser/token", "foo:inccorrect", 200)
+				w := makeRequest("http://example.com/user/thenameofauser/ticket", "foo:inccorrect", 200)
 				So(w.Code, ShouldEqual, 401)
 			})
 		})
