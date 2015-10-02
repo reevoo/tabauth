@@ -90,7 +90,7 @@ Prebuilt binaries for Windows/amd64 are avalible on the [releases page](https://
   "otheruser": "sekret"
 }
 ```
-4. Setup the service using nssm:
+5. Setup the service using nssm:
 ```
 nssm install tabauth C:\Program Files\tabauth\tabauth.exe
 nssm start tabauth
