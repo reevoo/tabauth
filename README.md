@@ -1,7 +1,42 @@
 # tabauth
 
-Tabauth is a thin wrapper service over Tableau Server's [Trusted Authentication Endpoint](http://onlinehelp.tableau.com/current/server/en-us/help.htm#trusted_auth.htm%3FTocPath%3DAdministrator%2520Guide%7CTrusted%2520Authentication%7C_____0)
-It allows other servers, to authenticate using BasicAuth over https. This removes any requirement for consuming applications to have static IP addresses.
+tabauth is a thin wrapper service over Tableau Server's
+[Trusted Authentication Endpoint](http://onlinehelp.tableau.com/current/server/en-us/help.htm#trusted_auth.htm%3FTocPath%3DAdministrator%2520Guide%7CTrusted%2520Authentication%7C_____0) 
+that allows other servers, to authenticate using BasicAuth over https. tabauth removes any requirement for consuming applications to have static IP addresses.
+
+## Installation
+
+This program is designed to be portable, so does not include any `Windows Service` functionality. We recommend running it with [NSSM](http://nssm.cc/).
+
+Prebuilt binaries for Windows/amd64 are avalible on the [releases page](https://github.com/reevoo/tabauth/releases)
+
+1. Create `C:\Program Files\tabauth\` (for example, put it wherever you like, but if its not here you may have to mess with permissions)
+2. Copy `tabauth.exe` to `C:\Program Files\tabauth\`
+3. Copy `cert.pem` and `key.pem` to `C:\Program Files\tabauth\`
+4. Add accounts.json to `C:\Program Files\tabauth`
+  ```json
+  {
+    "user": "password",
+    "otheruser": "sekret"
+  }
+  ```
+5. Setup the service using nssm:
+```
+nssm install tabauth C:\Program Files\tabauth\tabauth.exe
+nssm start tabauth
+```
+The defaults should be fine, but you may want to adjust details like Logging etc:
+`nssm edit tabauth`
+
+### Tableau Server Setup
+
+In order for Tableau Server to "trust" tabauth, we need to configure it thus:
+
+1. Get to the tabadmin command - `cd C:\Program Files\Tableau\Tableau Server\9.1\bin`
+2. Stop tableau server - `tabadmin stop`
+3. Set localhost as trusted - `tabadmin set wgserver.trusted_hosts "127.0.0.1"`
+4. Reload config files - `tabadmin config`
+5. Restart tableau server `tabadmin start`
 
 ## Usage
 
@@ -30,7 +65,7 @@ $ curl --user user:password https://your-tableau-server/user/user-name/token?sit
 vgLDqQwHx_09iiUUDZwFPacZ
 ```
 
-## Development
+## Development Requirements
 
 You need go:
 
@@ -74,39 +109,7 @@ Then you can cross compile for windows, by setting GOOS and GOARCH appropriately
 $ env GOOS=windows GOARCH=amd64 go build tabauth.go
 ```
 
-## Installation
 
-This program is designed to be portable, so does not include any `Windows Service` functionality. We recommend running it with [NSSM](http://nssm.cc/).
-
-Prebuilt binaries for Windows/amd64 are avalible on the [releases page](https://github.com/reevoo/tabauth/releases)
-
-1. Create `C:\Program Files\tabauth\` (for example, put it wherever you like, but if its not here you may have to mess with permissions)
-2. Copy `tabauth.exe` to `C:\Program Files\tabauth\`
-3. Copy `cert.pem` and `key.pem` to `C:\Program Files\tabauth\`
-4. Add accounts.json to `C:\Program Files\tabauth`
-```json
-{
-  "user": "password",
-  "otheruser": "sekret"
-}
-```
-5. Setup the service using nssm:
-```
-nssm install tabauth C:\Program Files\tabauth\tabauth.exe
-nssm start tabauth
-```
-The defaults should be fine, but you may want to adjust details like Logging etc:
-`nssm edit tabauth`
-
-### Tableau Server Setup
-
-In order for Tableau Server to "trust" tabauth, we need to configure it thus:
-
-1. Get to the tabadmin command - `cd C:\Program Files\Tableau\Tableau Server\9.1\bin`
-2. Stop tableau server - `tabadmin stop`
-3. Set localhost as trusted - `tabadmin set wgserver.trusted_hosts "127.0.0.1"`
-4. Reload config files - `tabadmin config`
-5. Restart tableau server `tabadmin start`
 
 
 ## Licence
