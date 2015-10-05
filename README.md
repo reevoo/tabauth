@@ -6,13 +6,16 @@ that allows other servers, to authenticate using BasicAuth over https. tabauth r
 
 ## Installation
 
+These instuctions presume that you are running tabauth on the same server as Tableau Server. If you are running tabauth on another server, 
+you will need to ensure that you have a static ip addess, and modify the instuctions for setting up Tableau Server appropriately.
+
 This program is designed to be portable, so does not include any `Windows Service` functionality. We recommend running it with [NSSM](http://nssm.cc/).
 
 Prebuilt binaries for Windows/amd64 are avalible on the [releases page](https://github.com/reevoo/tabauth/releases)
 
 1. Create `C:\Program Files\tabauth\` (for example, put it wherever you like, but if its not here you may have to mess with permissions)
 2. Copy `tabauth.exe` to `C:\Program Files\tabauth\`
-3. Copy `cert.pem` and `key.pem` to `C:\Program Files\tabauth\`
+3. Copy `cert.pem` and `key.pem` to `C:\Program Files\tabauth\`, you may be provided these by your CA or can [generate your own self-signed certificate](https://devcenter.heroku.com/articles/ssl-certificate-self)
 4. Add accounts.json to `C:\Program Files\tabauth` [example](./accounts.json.example)
 5. Setup the service using nssm:
 ```
