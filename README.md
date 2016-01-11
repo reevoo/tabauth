@@ -18,12 +18,16 @@ Prebuilt binaries for Windows/amd64 are avalible on the [releases page](https://
 3. Copy `cert.pem` and `key.pem` to `C:\Program Files\tabauth\`, you may be provided these by your CA or can [generate your own self-signed certificate](https://devcenter.heroku.com/articles/ssl-certificate-self)
 4. Add accounts.json to `C:\Program Files\tabauth` [example](./accounts.json.example)
 5. Setup the service using nssm:
-```
-nssm install tabauth C:\Program Files\tabauth\tabauth.exe
-nssm start tabauth
-```
-The defaults should be fine, but you may want to adjust details like Logging etc:
+`nssm install tabauth C:\Program Files\tabauth\tabauth.exe`
+
+set up the environment variables, e.g.
+`nssm set tabauth AppEnvironmentExtra TABLEAU_ENDPOINT=https://your-tableau-server BIND_ADDR=0.0.0.0:1443`
+
+You may also want to adjust details like Logging etc:
 `nssm edit tabauth`
+
+Then start the service
+`nssm start tabauth`
 
 ### Tableau Server Setup
 

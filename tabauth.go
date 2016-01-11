@@ -6,12 +6,21 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
+        "log"
 )
 
 func main() {
-	client := &Client{"http://localhost", &http.Client{}}
+	if os.Getenv("TABLEAU_ENDPOINT") == "" {
+		log.Fatalln("TABLEAU_ENDPOINT not set in environment")
+	}
+
+	if os.Getenv("BIND_ADDR") == "" {
+		log.Fatalln("BIND_ADDR not set in environment")
+	}
+	client := &Client{os.Getenv("TABLEAU_ENDPOINT"), &http.Client{}}
 	r := TabAuth(client)
-	r.RunTLS("0.0.0.0:443", "cert.pem", "key.pem")
+	r.RunTLS(os.Getenv("BIND_ADDR"), "cert.pem", "key.pem")
 }
 
 func TabAuth(client *Client) *gin.Engine {
