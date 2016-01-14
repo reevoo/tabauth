@@ -108,7 +108,7 @@ func mockHTTP(code int) *httptest.Server {
 		}
 		if code == 404 {
 			w.WriteHeader(200)
-			fmt.Fprintln(w, "-1")
+			fmt.Fprint(w, "-1")
 		} else {
 			body, _ := ioutil.ReadAll(r.Body)
 			w.WriteHeader(code)

@@ -86,7 +86,7 @@ func (t TabAuth) tabauthHandler(w http.ResponseWriter, r *http.Request) (int, er
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
-	if token == "-1\n" {
+	if token == "-1" {
 		return http.StatusNotFound, errors.New("tabauth: token not found")
 	}
 	fmt.Fprintf(w, token)
