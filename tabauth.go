@@ -62,7 +62,7 @@ func (t TabAuth) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	status, err := t.TabauthHandler(w, r)
+	status, err := t.tabauthHandler(w, r)
 	if err != nil {
 		log.Printf("HTTP %d: %s", status, err.Error())
 		http.Error(w, http.StatusText(status), status)
@@ -77,7 +77,7 @@ func (t TabAuth) isAuthenticated(r *http.Request) bool {
 	return false
 }
 
-func (t TabAuth) TabauthHandler(w http.ResponseWriter, r *http.Request) (int, error) {
+func (t TabAuth) tabauthHandler(w http.ResponseWriter, r *http.Request) (int, error) {
 	user, err := username(r.URL.Path)
 	if err != nil {
 		return http.StatusBadRequest, err
