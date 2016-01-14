@@ -4,6 +4,17 @@ tabauth is a thin wrapper service over Tableau Server's
 [Trusted Authentication Endpoint](http://onlinehelp.tableau.com/current/server/en-us/help.htm#trusted_auth.htm%3FTocPath%3DAdministrator%2520Guide%7CTrusted%2520Authentication%7C_____0) 
 that allows other servers, to authenticate using BasicAuth over https. tabauth removes any requirement for consuming applications to have static IP addresses.
 
+
+## Usage
+
+```
+Usage of ./tabauth:
+  -bind string
+        the address to bind the tabauth server to (default "0.0.0.0:1443")
+  -endpoint string
+        the url for tableau server (default "http://localhost")
+```
+
 ## Installation
 
 These instuctions presume that you are running tabauth on the same server as Tableau Server. If you are running tabauth on another server, 
@@ -18,10 +29,7 @@ Prebuilt binaries for Windows/amd64 are avalible on the [releases page](https://
 3. Copy `cert.pem` and `key.pem` to `C:\Program Files\tabauth\`, you may be provided these by your CA or can [generate your own self-signed certificate](https://devcenter.heroku.com/articles/ssl-certificate-self)
 4. Add accounts.json to `C:\Program Files\tabauth` [example](./accounts.json.example)
 5. Setup the service using nssm:
-`nssm install tabauth C:\Program Files\tabauth\tabauth.exe`
-
-set up the environment variables, e.g.
-`nssm set tabauth AppEnvironmentExtra TABLEAU_ENDPOINT=https://your-tableau-server BIND_ADDR=0.0.0.0:1443`
+`nssm install tabauth 'C:\Program Files\tabauth\tabauth.exe' '-endpoint=https://tableau.reevoo.com' '-bind=:1443'`
 
 You may also want to adjust details like Logging etc:
 `nssm edit tabauth`
@@ -35,7 +43,7 @@ In order for Tableau Server to "trust" tabauth, we need to configure it thus:
 
 1. Get to the tabadmin command - `cd C:\Program Files\Tableau\Tableau Server\9.1\bin`
 2. Stop tableau server - `tabadmin stop`
-3. Set localhost as trusted - `tabadmin set wgserver.trusted_hosts "127.0.0.1"`
+3. Set localhost as trusted - `tabadmin set wgserver.trusted_hosts "yourhost"`
 4. Reload config files - `tabadmin config`
 5. Restart tableau server `tabadmin start`
 
@@ -77,19 +85,13 @@ Or follow these instructions for [other platforms](https://golang.org/doc/instal
 
 ## Testing
 
-This project is tested with [GoConvey](http://goconvey.co/).
+This project is tested
 
-You can run the tests:
+You can run the tests from the command line: 
 
-* From the command line:
-`go test`
-
-* In the browser:
 ```bash
-go get github.com/smartystreets/goconvey
-$GOPATH/bin/goconvey
-```
-Then visit [localhost:8080](http://localhost:8080)
+$ go test
+`
 
 ## Building
 
@@ -109,9 +111,6 @@ Then you can cross compile for windows, by setting GOOS and GOARCH appropriately
 ```bash
 $ env GOOS=windows GOARCH=amd64 go build tabauth.go
 ```
-
-
-
 
 ## Licence
 

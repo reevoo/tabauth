@@ -3,24 +3,25 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"regexp"
 )
 
 var pathRegexp = regexp.MustCompile(`\A\/user\/([^/]+)\/ticket\z`)
 
 func main() {
-	tableauEndpoint := os.Getenv("TABLEAU_ENDPOINT")
-	if tableauEndpoint == "" {
-		tableauEndpoint = "http://localhost"
+	endpoint := flag.String("endpoint", "http://localhost", "the url for tableau server")
+	bind := flag.String("bind", ":1443", "the address to bind the tabauth server to")
+	flag.Parse()
+	err := New(*bind, *endpoint).ListenAndServeTLS("cert.pem", "key.pem")
+	if err != nil {
+		log.Fatal(err)
 	}
-
-	New(os.Getenv("BIND_ADDR"), tableauEndpoint).ListenAndServeTLS("cert.pem", "key.pem")
 }
 
 //New returns a new *http.Server with the provided configuration
