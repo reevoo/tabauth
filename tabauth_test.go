@@ -3,71 +3,87 @@ package main_test
 import (
 	"encoding/base64"
 	"fmt"
-	. "github.com/reevoo/tabauth/Godeps/_workspace/src/github.com/smartystreets/goconvey/convey"
+	"github.com/reevoo/tabauth"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-        "github.com/reevoo/tabauth"
 )
 
-func TestTabAuth(t *testing.T) {
-	Convey("Given an instance of the engine", t, func() {
-		Convey("And the user is authorized", func() {
-			Convey("They should see a 400 when visting the wrong path", func() {
-				w := makeRequest("http://example.com/foo", "foo:bar", 200)
-				So(w.Code, ShouldEqual, 400)
-			})
+func TestBadRequest(t *testing.T) {
+	w := makeRequest("http://example.com/foo", "foo:bar", 200)
 
-			Convey("They should see a 200 when visting the correct path", func() {
-				w := makeRequest("http://example.com/user/foofah/ticket", "foo:bar", 200)
-				So(w.Code, ShouldEqual, 200)
-			})
+	if expected := 400; w.Code != expected {
+		t.Errorf("Expected HTTP status: %v to eq %v", w.Code, expected)
+	}
+}
 
-			Convey("They should see a 500 when the backend is down", func() {
-				w := makeRequest("http://example.com/user/foofah/ticket", "foo:bar", 500)
-				So(w.Code, ShouldEqual, 500)
-			})
+func TestGoodRequest(t *testing.T) {
+	w := makeRequest("http://example.com/user/foofah/ticket", "foo:bar", 200)
 
-			Convey("They should see a 404 when the backend cannot find the ticket", func() {
-				w := makeRequest("http://example.com/user/foofah/ticket", "foo:bar", 404)
-				So(w.Body.String(), ShouldEqual, "Not Found\n")
-				So(w.Code, ShouldEqual, 404)
-			})
+	if expected := 200; w.Code != expected {
+		t.Errorf("Expected HTTP status: %v to eq %v", w.Code, expected)
+	}
+}
 
-			Convey("the backend is called with the correct body, the ticket is returned unchanged", func() {
-				w := makeRequest("http://example.com/user/iamtheuser/ticket", "foo:bar", 200)
-				So(w.Body.String(), ShouldEqual, "username=iamtheuser\n")
-			})
+func TestBackendDown(t *testing.T) {
+	w := makeRequest("http://example.com/user/foofah/ticket", "foo:bar", 500)
 
-			Convey("When the client IP is given, it is passed to the backend, the ticket is returned unchanged", func() {
-				w := makeRequest("http://example.com/user/iamtheuser/ticket?client_ip=10.10.10.15", "foo:bar", 200)
-				So(w.Body.String(), ShouldEqual, "client_ip=10.10.10.15&username=iamtheuser\n")
-			})
+	if expected := 500; w.Code != expected {
+		t.Errorf("Expected HTTP status: %v to eq %v", w.Code, expected)
+	}
+}
 
-			Convey("When the site ID is given, it is passed to the backend, the ticket is returned unchanged", func() {
-				w := makeRequest("http://example.com/user/iamtheuser/ticket?site_id=sdf86438brf34", "foo:bar", 200)
-				So(w.Body.String(), ShouldEqual, "target_site=sdf86438brf34&username=iamtheuser\n")
-			})
+func TestTicketNotFound(t *testing.T) {
+	w := makeRequest("http://example.com/user/foofah/ticket", "foo:bar", 404)
 
-			Convey("When the site ID and client IP are given, they are passed to the backend, the ticket is returned unchanged", func() {
-				w := makeRequest("http://example.com/user/iamtheuser/ticket?site_id=sdf86438brf34&client_ip=127.0.0.1", "foo:bar", 200)
-				So(w.Body.String(), ShouldEqual, "client_ip=127.0.0.1&target_site=sdf86438brf34&username=iamtheuser\n")
-			})
-		})
+	if expected := 404; w.Code != expected {
+		t.Errorf("Expected HTTP status: %v to eq %v", w.Code, expected)
+	}
 
-		Convey("And the user is unauthorized", func() {
-			Convey("They should see a 401 error when visiting the wrong path", func() {
-				w := makeRequest("http://example.com/foo", "foo:inccorrect", 200)
-				So(w.Code, ShouldEqual, 401)
-			})
+	if expected := "Not Found\n"; w.Body.String() != expected {
+		t.Errorf("Expected Body: %v to eq %v", w.Body.String(), expected)
+	}
+}
 
-			Convey("They should see a 401 error when visiting a valid path", func() {
-				w := makeRequest("http://example.com/user/thenameofauser/ticket", "foo:inccorrect", 200)
-				So(w.Code, ShouldEqual, 401)
-			})
-		})
-	})
+func TestTicketBody(t *testing.T) {
+	w := makeRequest("http://example.com/user/iamtheuser/ticket", "foo:bar", 200)
+
+	if expected := "username=iamtheuser\n"; w.Body.String() != expected {
+		t.Errorf("Expected Body: %v to eq %v", w.Body.String(), expected)
+	}
+}
+
+func TestPassingClientIP(t *testing.T) {
+	w := makeRequest("http://example.com/user/iamtheuser/ticket?client_ip=10.10.10.15", "foo:bar", 200)
+	if expected := "client_ip=10.10.10.15&username=iamtheuser\n"; w.Body.String() != expected {
+		t.Errorf("Expected Body: %v to eq %v", w.Body.String(), expected)
+	}
+}
+
+func TestPassingSiteID(t *testing.T) {
+	w := makeRequest("http://example.com/user/iamtheuser/ticket?site_id=sdf86438brf34", "foo:bar", 200)
+	if expected := "target_site=sdf86438brf34&username=iamtheuser\n"; w.Body.String() != expected {
+		t.Errorf("Expected Body: %v to eq %v", w.Body.String(), expected)
+	}
+}
+
+func TestPassingSiteIDandClientIP(t *testing.T) {
+	w := makeRequest("http://example.com/user/iamtheuser/ticket?site_id=sdf86438brf34&client_ip=127.0.0.1", "foo:bar", 200)
+	if expected := "client_ip=127.0.0.1&target_site=sdf86438brf34&username=iamtheuser\n"; w.Body.String() != expected {
+		t.Errorf("Expected Body: %v to eq %v", w.Body.String(), expected)
+	}
+}
+
+func TestUnauthorized(t *testing.T) {
+	w := makeRequest("http://example.com/foo", "foo:inccorrect", 200)
+	if expected := 401; w.Code != expected {
+		t.Errorf("Expected HTTP status: %v to eq %v", w.Code, expected)
+	}
+	w = makeRequest("http://example.com/user/thenameofauser/ticket", "foo:inccorrect", 200)
+	if expected := 401; w.Code != expected {
+		t.Errorf("Expected HTTP status: %v to eq %v", w.Code, expected)
+	}
 }
 
 func makeRequest(url string, auth string, code int) httptest.ResponseRecorder {
