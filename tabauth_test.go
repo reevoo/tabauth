@@ -7,16 +7,15 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"testing"
 )
 
 func TestTabAuth(t *testing.T) {
 	Convey("Given an instance of the engine", t, func() {
 		Convey("And the user is authorized", func() {
-			Convey("They should see a 404 when visting the wrong path", func() {
+			Convey("They should see a 400 when visting the wrong path", func() {
 				w := makeRequest("http://example.com/foo", "foo:bar", 200)
-				So(w.Code, ShouldEqual, 404)
+				So(w.Code, ShouldEqual, 400)
 			})
 
 			Convey("They should see a 200 when visting the correct path", func() {
@@ -31,8 +30,8 @@ func TestTabAuth(t *testing.T) {
 
 			Convey("They should see a 404 when the backend cannot find the ticket", func() {
 				w := makeRequest("http://example.com/user/foofah/ticket", "foo:bar", 404)
+				So(w.Body.String(), ShouldEqual, "Not Found\n")
 				So(w.Code, ShouldEqual, 404)
-				So(w.Body.String(), ShouldEqual, "-1\n")
 			})
 
 			Convey("the backend is called with the correct body, the ticket is returned unchanged", func() {
@@ -71,18 +70,18 @@ func TestTabAuth(t *testing.T) {
 }
 
 func makeRequest(url string, auth string, code int) httptest.ResponseRecorder {
-	server, client := mockHTTP(code)
-	engine := TabAuth(client)
+	server := mockHTTP(code)
+	engine := Tabauth("", server.URL)
 	req, _ := http.NewRequest("GET", url, nil)
 	authString := base64.StdEncoding.EncodeToString([]byte(auth))
 	req.Header.Add("Authorization", "Basic "+authString)
 	recorder := httptest.NewRecorder()
-	engine.ServeHTTP(recorder, req)
+	engine.Handler.ServeHTTP(recorder, req)
 	server.Close()
 	return *recorder
 }
 
-func mockHTTP(code int) (*httptest.Server, *Client) {
+func mockHTTP(code int) *httptest.Server {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/trusted" {
 			panic("hit backend with the wrong path")
@@ -99,15 +98,5 @@ func mockHTTP(code int) (*httptest.Server, *Client) {
 			fmt.Fprintln(w, string(body))
 		}
 	}))
-
-	transport := &http.Transport{
-		Proxy: func(req *http.Request) (*url.URL, error) {
-			return url.Parse(server.URL)
-		},
-	}
-
-	httpClient := &http.Client{Transport: transport}
-	client := &Client{server.URL, httpClient}
-
-	return server, client
+	return server
 }
