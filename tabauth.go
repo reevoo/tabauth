@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -19,58 +20,18 @@ func main() {
 		tableauEndpoint = "http://localhost"
 	}
 
-	Tabauth(os.Getenv("BIND_ADDR"), tableauEndpoint).ListenAndServeTLS("cert.pem", "key.pem")
+	New(os.Getenv("BIND_ADDR"), tableauEndpoint).ListenAndServeTLS("cert.pem", "key.pem")
 }
 
-
-func Tabauth(bindAddress string, tableauEndpoint string) *http.Server {
+//New returns a new *http.Server with the provided configuration
+func New(bindAddress string, tableauEndpoint string) *http.Server {
 	return &http.Server{
 		Addr: bindAddress,
-		Handler: tabauth{
+		Handler: TabAuth{
 			&Client{tableauEndpoint, &http.Client{}},
 			accounts(),
 		},
 	}
-}
-
-type tabauth struct {
-	*Client
-	accounts map[string]string
-	//handler  func(tabauth, http.ResponseWriter, *http.Request) (int, error)
-}
-
-func (t tabauth) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	status, err := t.TabauthHandler(w, r)
-	if err != nil {
-		http.Error(w, http.StatusText(status), status)
-	}
-}
-
-func (t tabauth) TabauthHandler(w http.ResponseWriter, r *http.Request) (int, error) {
-	if !isAuthenticated(r, t.accounts) {
-		return http.StatusUnauthorized, errors.New("tabauth: unauthenticated")
-	}
-	user, err := username(r.URL.Path)
-	if err != nil {
-		return http.StatusBadRequest, err
-	}
-	token, err := t.Client.getToken(user, r.FormValue("site_id"), r.FormValue("client_ip"))
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
-	if token == "-1\n" {
-		return http.StatusNotFound, errors.New("tabauth: token not found")
-	}
-	fmt.Fprintf(w, token)
-	return http.StatusOK, nil
-}
-
-func isAuthenticated(r *http.Request, accounts map[string]string) bool {
-	username, password, ok := r.BasicAuth()
-	if ok && password == accounts[username] {
-		return true
-	}
-	return false
 }
 
 func accounts() map[string]string {
@@ -86,6 +47,52 @@ func accounts() map[string]string {
 	return accs
 }
 
+//TabAuth is a http.Handler for the Tabauth Application
+type TabAuth struct {
+	*Client
+	accounts map[string]string
+}
+
+//ServeHTTP impliments the http.Handler interface on TabAuth
+//We ensure that the request is authenticated before passing it to the TabauthHandler
+//We also handle any errors here.
+func (t TabAuth) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if !t.isAuthenticated(r) {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+
+	status, err := t.TabauthHandler(w, r)
+	if err != nil {
+		log.Printf("HTTP %d: %s", status, err.Error())
+		http.Error(w, http.StatusText(status), status)
+	}
+}
+
+func (t TabAuth) isAuthenticated(r *http.Request) bool {
+	username, password, ok := r.BasicAuth()
+	if ok && password == t.accounts[username] {
+		return true
+	}
+	return false
+}
+
+func (t TabAuth) TabauthHandler(w http.ResponseWriter, r *http.Request) (int, error) {
+	user, err := username(r.URL.Path)
+	if err != nil {
+		return http.StatusBadRequest, err
+	}
+	token, err := t.Client.GetToken(user, r.FormValue("site_id"), r.FormValue("client_ip"))
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	if token == "-1\n" {
+		return http.StatusNotFound, errors.New("tabauth: token not found")
+	}
+	fmt.Fprintf(w, token)
+	return http.StatusOK, nil
+}
+
 func username(path string) (string, error) {
 	match := pathRegexp.FindStringSubmatch(path)
 	if len(match) > 1 {
@@ -94,21 +101,24 @@ func username(path string) (string, error) {
 	return "", errors.New("tabauth: bad request")
 }
 
+//Client is a client for Tableau Server's Trusted Authentication API
+// http://onlinehelp.tableau.com/current/server/en-us/trusted_auth.htm
 type Client struct {
-	BaseUrl    string
+	BaseURL    string
 	HTTPClient *http.Client
 }
 
-func (c *Client) getToken(username, siteId, clientIp string) (string, error) {
+//GetToken returns the authentication token for the given params
+func (c *Client) GetToken(username, siteID, clientIP string) (string, error) {
 	form := url.Values{}
 	form.Add("username", username)
-	if siteId != "" {
-		form.Add("target_site", siteId)
+	if siteID != "" {
+		form.Add("target_site", siteID)
 	}
-	if clientIp != "" {
-		form.Add("client_ip", clientIp)
+	if clientIP != "" {
+		form.Add("client_ip", clientIP)
 	}
-	resp, err := c.HTTPClient.PostForm(c.BaseUrl+"/trusted", form)
+	resp, err := c.HTTPClient.PostForm(c.BaseURL+"/trusted", form)
 	if err != nil {
 		return "", err
 	}

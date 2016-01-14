@@ -1,4 +1,4 @@
-package main
+package main_test
 
 import (
 	"encoding/base64"
@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+        "github.com/reevoo/tabauth"
 )
 
 func TestTabAuth(t *testing.T) {
@@ -71,7 +72,7 @@ func TestTabAuth(t *testing.T) {
 
 func makeRequest(url string, auth string, code int) httptest.ResponseRecorder {
 	server := mockHTTP(code)
-	engine := Tabauth("", server.URL)
+	engine := main.New("", server.URL)
 	req, _ := http.NewRequest("GET", url, nil)
 	authString := base64.StdEncoding.EncodeToString([]byte(auth))
 	req.Header.Add("Authorization", "Basic "+authString)
